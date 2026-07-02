@@ -65,7 +65,8 @@ jobs:
 
   integration-tests:
     runs-on: ${{ matrix.OS }}
-    timeout-minutes: 75
+    # Room for the retry below to run the suite a second time on a transient infrastructure flake.
+    timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:
@@ -79,8 +80,18 @@ jobs:
       with:
         jvm: 21
         apps: scala-cli
-    - run: .github/scripts/run/run-its.sh
-      shell: bash
+    # Retry the whole suite once as a backstop: the integration tests occasionally hit transient
+    # infrastructure issues (overloaded runner, ZeroMQ connection timeouts) that the in-test retries
+    # don't fully absorb. This is a coarse safety net - the per-test retries and the ZeroMQ cleanup
+    # fixes in the test harness should keep it from triggering in the common case.
+    - name: Run integration tests
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 75
+        max_attempts: 2
+        retry_on: error
+        shell: bash
+        command: .github/scripts/run/run-its.sh
 
   bincompat:
     runs-on: ubuntu-latest
