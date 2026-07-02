@@ -57,8 +57,7 @@ object Tests {
     runner: Runner
   ): Unit = {
 
-    val isScala2   = scalaVersion.startsWith("2.")
-    val isScala212 = scalaVersion.startsWith("2.12.")
+    val isScala2 = scalaVersion.startsWith("2.")
 
     runner.withSession() { implicit session =>
 
@@ -80,10 +79,7 @@ object Tests {
         "Thread.sleep(6000L)",
         "",
         // the update originates from the previous cell, but arrives while the third one is running
-        displaysTextUpdates = Seq(
-          if (isScala212) "f: Future[Int] = Success(2)"
-          else "f: Future[Int] = Success(value = 2)"
-        )
+        displaysTextUpdates = Seq("f: Future[Int] = Success(2)")
       )
     }
   }
@@ -95,8 +91,7 @@ object Tests {
 
     // same as above, except no cell is running when the future completes
 
-    val isScala2   = scalaVersion.startsWith("2.")
-    val isScala212 = scalaVersion.startsWith("2.12.")
+    val isScala2 = scalaVersion.startsWith("2.")
 
     runner.withSession() { implicit session =>
       execute(
@@ -111,10 +106,7 @@ object Tests {
         "val f = Future { Thread.sleep(3000L); 2 }",
         "",
         displaysText = Seq("f: Future[Int] = [running]"),
-        displaysTextUpdates = Seq(
-          if (isScala212) "f: Future[Int] = Success(2)"
-          else "f: Future[Int] = Success(value = 2)"
-        ),
+        displaysTextUpdates = Seq("f: Future[Int] = Success(2)"),
         waitForUpdateDisplay = true
       )
     }
