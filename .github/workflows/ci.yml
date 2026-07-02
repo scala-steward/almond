@@ -146,12 +146,3 @@ jobs:
         done
         ./mill -i __.publishLocal
       shell: bash
-
-  # job whose name doesn't change when we bump Scala versions, add OSes, …
-  # We require this job for auto-merge.
-  all-tests:
-    needs: [examples, bincompat, test, integration-tests, website, publishLocal]
-    runs-on: ubuntu-latest
-    steps:
-    - run: true
-      shell: bash
